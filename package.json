@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/google-apps-script": "^1.0.56"
   },
-  "name": "workspace-addon",
+  "name": "simple-textract-addon",
   "description": "",
   "version": "1.0.0",
   "devDependencies": {
@@ -21,14 +21,16 @@
     "typescript": "^4.9.4"
   },
   "scripts": {
-    "deploy": "npx jest && clasp push",
+    "deploy": "npm run format && npm test && npm run lint && clasp push",
     "test": "npx jest",
+    "format": "npx prettier --check .",
     "format:fix": "npx prettier --write .",
-    "lint:fix": "npx eslint --fix project/**/*.ts"
+    "lint": "npx eslint src/**/*.ts",
+    "lint:fix": "npx eslint --fix src/**/*.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/uoya/workspace-addon.git"
+    "url": "git+https://github.com/uoya/simple-textract-addon.git"
   },
   "keywords": [
     "appsscript"
@@ -36,7 +38,7 @@
   "author": "uoya.dev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/uoya/workspace-addon/issues"
+    "url": "https://github.com/uoya/simple-textract-addonn/issues"
   },
-  "homepage": "https://github.com/uoya/workspace-addon#readme"
+  "homepage": "https://github.com/uoya/simple-textract-addon#readme"
 }

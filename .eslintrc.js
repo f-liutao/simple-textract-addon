@@ -1,13 +1,13 @@
 module.exports = {
   plugins: ["googleappsscript"],
   env: {
-    "googleappsscript/googleappsscript": true,
+    "googleappsscript/googleappsscript": true
   },
   extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
-    project: ["tsconfig.json"],
+    project: ["tsconfig.json"]
   },
   rules: {
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",
@@ -17,9 +17,9 @@ module.exports = {
       "error",
       {
         before: false,
-        after: true,
-      },
+        after: true
+      }
     ],
-    "comma-dangle": ["error", "never"],
-  },
+    "comma-dangle": ["error", "never"]
+  }
 };

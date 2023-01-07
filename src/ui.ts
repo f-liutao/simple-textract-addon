@@ -3,9 +3,9 @@ import { AlertMessage, AlertTitle } from "./types";
 export class UI {
   static init() {
     const ui = SpreadsheetApp.getUi();
+
     ui.createAddonMenu()
       .addItem("画像から文字列抽出", "main")
-      .addItem("設定", "UI.showSettings")
       .addToUi();
   }
 

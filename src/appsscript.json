@@ -2,18 +2,16 @@
   "timeZone": "Asia/Tokyo",
   "addOns": {
     "common": {
-      "logoUrl": "https://raw.githubusercontent.com/uoya/workspace-addon/main/project/simple-textract/asset/simple-textract-icon.png",
+      "logoUrl": "https://raw.githubusercontent.com/uoya/simple-textract-addon/main/asset/simple-textract-icon.png",
       "name": "Simple Textract",
       "useLocaleFromApp": true,
       "universalActions": [
         {
           "label": "Feedback",
-          "openLink": "https://github.com/uoya/workspace-addon/issues"
+          "openLink": "https://github.com/uoya/simple-textract-addon/issues"
         }
       ],
-      "openLinkUrlPrefixes": [
-        "https://github.com/uoya/workspace-addon"
-      ]
+      "openLinkUrlPrefixes": ["https://github.com/uoya/simple-textract-addon"]
     },
     "sheets": {}
   },
