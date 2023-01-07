@@ -24,7 +24,7 @@ function onOpen(e): void {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function main(): void {
-    const folderUrl = UI.startPrompt(); // TODO キャンセルボタンを押した際の処理とURLからの場合が同じ扱いになっているのでなんとかしたい
+    const folderUrl = UI.startPrompt(); // TODO キャンセルボタンを押した際の処理とURLが空の場合が同じ扱いになっているのでなんとかしたい
     Logger.log(`user input: ${folderUrl}`);
     if (folderUrl === "") {
         const title = "正常終了。" as AlertTitle;
@@ -113,4 +113,23 @@ function realMain(
         file.moveTo(doneFolder); // 処理済み画像ファイルを移動
     }
     sheetService.appendData(namedRange, sheetData); // 最後にかならず書き出し。
+}
+/**
+ * Gets the user's OAuth 2.0 access token so that it can be passed to Picker.
+ * This technique keeps Picker from needing to show its own authorization
+ * dialog, but is only possible if the OAuth scope that Picker needs is
+ * available in Apps Script. In this case, the function includes an unused call
+ * to a DriveApp method to ensure that Apps Script requests access to all files
+ * in the user's Drive.
+ *
+ * @return {string} The user's OAuth 2.0 access token.
+ */
+function getOAuthToken() {
+    try {
+        DriveApp.getRootFolder();
+        return ScriptApp.getOAuthToken();
+    } catch (e) {
+        // TODO (Developer) - Handle exception
+        console.log('Failed with error: %s', e.error);
+    }
 }
