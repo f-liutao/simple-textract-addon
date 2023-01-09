@@ -22,6 +22,11 @@ function onOpen(e): void {
     UI.init();
 }
 
+function test(id: string):void {
+    Logger.log(id);
+}
+
+// TODO main 関数が起動のエンドポイントではなくなるので、それに合わせて書き換える
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function main(): void {
     const folderUrl = UI.startPrompt(); // TODO キャンセルボタンを押した際の処理とURLが空の場合が同じ扱いになっているのでなんとかしたい
