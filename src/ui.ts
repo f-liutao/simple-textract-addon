@@ -41,9 +41,9 @@ export class UI {
     static showPicker() {
         const ui = SpreadsheetApp.getUi();
         const html = HtmlService.createHtmlOutputFromFile("view/dialog")
-            .setWidth(600)
-            .setHeight(425)
+            .setWidth(800)
+            .setHeight(600)
             .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-        ui.showModalDialog(html, "Select a file");
+        ui.showModalDialog(html, "Simple Textract");
     }
 }

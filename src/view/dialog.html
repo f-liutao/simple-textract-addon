@@ -6,17 +6,19 @@
     <script>
         // IMPORTANT: Replace the value for DEVELOPER_KEY with the API key obtained
         // from the Google Developers Console.
-        var DEVELOPER_KEY = 'AIzaSyDwRLO8uKDHOIjBztYPJka7FMe_2z0A9Gg';
-        var DIALOG_DIMENSIONS = {width: 600, height: 425};
-        var pickerApiLoaded = false;
+        const DEVELOPER_KEY = 'AIzaSyDwRLO8uKDHOIjBztYPJka7FMe_2z0A9Gg';
+        const DIALOG_DIMENSIONS = {width: 600, height: 425};
+        let pickerApiLoaded = false;
 
         /**
          * Loads the Google Picker API.
          */
         function onApiLoad() {
-            gapi.load('picker', {'callback': function() {
+            gapi.load('picker', {
+                'callback': function () {
                     pickerApiLoaded = true;
-                }});
+                }
+            });
         }
 
         /**
@@ -41,10 +43,15 @@
          */
         function createPicker(token) {
             if (pickerApiLoaded && token) {
-                var picker = new google.picker.PickerBuilder()
-                    // Instruct Picker to display only spreadsheets in Drive. For other
-                    // views, see https://developers.google.com/picker/docs/#otherviews
-                    .addView(google.picker.ViewId.SPREADSHEETS)
+                const docsView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+                    .setIncludeFolders(true)
+                    // .setMimeTypes('application/vnd.google-apps.folder')
+                    .setSelectFolderEnabled(true);
+
+
+                const picker = new google.picker.PickerBuilder()
+                    // .addView(google.picker.ViewId.FOLDERS)
+                    .addView(docsView)
                     // Hide the navigation panel so that Picker fills more of the dialog.
                     .enableFeature(google.picker.Feature.NAV_HIDDEN)
                     // Hide the title bar since an Apps Script dialog already has a title.
@@ -73,17 +80,18 @@
 
         // TODO コールバックの中身を GAS 側に渡し、 google.script.run.withSuccessHandler(textract)　などで起動する
         function pickerCallback(data) {
-            var action = data[google.picker.Response.ACTION];
-            if (action == google.picker.Action.PICKED) {
-                var doc = data[google.picker.Response.DOCUMENTS][0];
-                var id = doc[google.picker.Document.ID];
-                var url = doc[google.picker.Document.URL];
-                var title = doc[google.picker.Document.NAME];
+            const action = data[google.picker.Response.ACTION];
+            // console.log(action);
+            if (action === google.picker.Action.PICKED) {
+                const doc = data[google.picker.Response.DOCUMENTS][0];
+                const id = doc[google.picker.Document.ID];
+                const url = doc[google.picker.Document.URL];
+                const title = doc[google.picker.Document.NAME];
                 google.script.run.test(id);
                 document.getElementById('result').innerHTML =
                     '<b>You chose:</b><br>Name: <a href="' + url + '">' + title +
                     '</a><br>ID: ' + id;
-            } else if (action == google.picker.Action.CANCEL) {
+            } else if (action === google.picker.Action.CANCEL) {
                 document.getElementById('result').innerHTML = 'Picker canceled.';
             }
         }
