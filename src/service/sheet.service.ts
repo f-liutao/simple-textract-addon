@@ -1,5 +1,5 @@
 const OUTPUT_SHEET_NAME = "textract";
-export const NAMED_RANGE_NAME = "textract_results";
+const NAMED_RANGE_NAME = "textract_results";
 const SHEET_HEADER = [
     "フォルダ番号",
     "ハッシュ値(sha1)",

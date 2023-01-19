@@ -22,40 +22,36 @@ function onOpen(e): void {
     UI.init();
 }
 
-function test(id: string):void {
-    Logger.log(id);
-}
-
 // TODO main 関数が起動のエンドポイントではなくなるので、それに合わせて書き換える
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function main(): void {
-    const folderUrl = UI.startPrompt(); // TODO キャンセルボタンを押した際の処理とURLが空の場合が同じ扱いになっているのでなんとかしたい
-    Logger.log(`user input: ${folderUrl}`);
-    if (folderUrl === "") {
-        const title = "正常終了。" as AlertTitle;
-        const message = "実行はキャンセルされました。" as AlertMessage;
-        UI.alert(message, title);
-        return;
-    }
+function main(folderId: string): void {
+    // const folderUrl = UI.startPrompt(); // TODO キャンセルボタンを押した際の処理とURLが空の場合が同じ扱いになっているのでなんとかしたい
+    // Logger.log(`user input: ${folderUrl}`);
+    // if (folderUrl === "") {
+    //     const title = "正常終了。" as AlertTitle;
+    //     const message = "実行はキャンセルされました。" as AlertMessage;
+    //     UI.alert(message, title);
+    //     return;
+    // }
 
-    // TODO Picker UI を利用するならこれは不要, 要はフォルダの ID が取れれば良い
-    if (!folderUrl.startsWith(DRIVE_URL_STARTS_WITH)) {
-        const message =
-            `URLを確認してください。Google Drive のフォルダの URL は ${DRIVE_URL_STARTS_WITH}... という書式です。` as AlertMessage;
-        UI.alert(message);
-        return;
-    }
+    // // TODO Picker UI を利用するならこれは不要, 要はフォルダの ID が取れれば良い
+    // if (!folderUrl.startsWith(DRIVE_URL_STARTS_WITH)) {
+    //     const message =
+    //         `URLを確認してください。Google Drive のフォルダの URL は ${DRIVE_URL_STARTS_WITH}... という書式です。` as AlertMessage;
+    //     UI.alert(message);
+    //     return;
+    // }
 
-    const matches = folderUrl.match(EXTRACT_ID_REGEX);
-    Logger.log(`matches by folderId extraction regex: ${matches}`);
-    if (!matches || matches.length < 1) {
-        const message =
-            "URLを確認してください。URL中のfolders/より後の文字列が切れていないか確認してください。" as AlertMessage;
-        UI.alert(message);
-        return;
-    }
+    // const matches = folderUrl.match(EXTRACT_ID_REGEX);
+    // Logger.log(`matches by folderId extraction regex: ${matches}`);
+    // if (!matches || matches.length < 1) {
+    //     const message =
+    //         "URLを確認してください。URL中のfolders/より後の文字列が切れていないか確認してください。" as AlertMessage;
+    //     UI.alert(message);
+    //     return;
+    // }
 
-    const folderId = matches[0];
+    // const folderId = matches[0];
 
     // GCP のプロジェクト側で Google Drive API を有効化しないと、getFolderById でエラーがでる
     // https://qiita.com/Cyber_Hacnosuke/items/9b76fbe95da54694d758
@@ -135,6 +131,6 @@ function getOAuthToken() {
         return ScriptApp.getOAuthToken();
     } catch (e) {
         // TODO (Developer) - Handle exception
-        console.log('Failed with error: %s', e.error);
+        console.log("Failed with error: %s", e.error);
     }
 }

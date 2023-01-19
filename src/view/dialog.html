@@ -6,7 +6,7 @@
     <script>
         // IMPORTANT: Replace the value for DEVELOPER_KEY with the API key obtained
         // from the Google Developers Console.
-        const DEVELOPER_KEY = 'AIzaSyDwRLO8uKDHOIjBztYPJka7FMe_2z0A9Gg';
+        // const DEVELOPER_KEY = 'AIzaSyDwRLO8uKDHOIjBztYPJka7FMe_2z0A9Gg';
         const DIALOG_DIMENSIONS = {width: 600, height: 425};
         let pickerApiLoaded = false;
 
@@ -42,33 +42,29 @@
          *     file type specified in the addView call.
          */
         function createPicker(token) {
-            if (pickerApiLoaded && token) {
-                const docsView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-                    .setIncludeFolders(true)
-                    // .setMimeTypes('application/vnd.google-apps.folder')
-                    .setSelectFolderEnabled(true);
-
-
-                const picker = new google.picker.PickerBuilder()
-                    // .addView(google.picker.ViewId.FOLDERS)
-                    .addView(docsView)
-                    // Hide the navigation panel so that Picker fills more of the dialog.
-                    .enableFeature(google.picker.Feature.NAV_HIDDEN)
-                    // Hide the title bar since an Apps Script dialog already has a title.
-                    .hideTitleBar()
-                    .setOAuthToken(token)
-                    .setDeveloperKey(DEVELOPER_KEY)
-                    .setCallback(pickerCallback)
-                    .setOrigin(google.script.host.origin)
-                    // Instruct Picker to fill the dialog, minus 2 pixels for the border.
-                    .setSize(DIALOG_DIMENSIONS.width - 2,
-                        DIALOG_DIMENSIONS.height - 2)
-                    .build();
-                picker.setVisible(true);
-            } else {
+            if (!pickerApiLoaded || !token) {
                 showError('Unable to load the file picker.');
+                return;
             }
+
+            const docsView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+                .setIncludeFolders(true)
+                .setSelectFolderEnabled(true);
+
+            const picker = new google.picker.PickerBuilder()
+                .addView(docsView)
+                .enableFeature(google.picker.Feature.NAV_HIDDEN)
+                .hideTitleBar()
+                .setOAuthToken(token)
+                // .setDeveloperKey(DEVELOPER_KEY)
+                .setCallback(pickerCallback)
+                .setOrigin(google.script.host.origin)
+                .setSize(DIALOG_DIMENSIONS.width - 2, DIALOG_DIMENSIONS.height - 2)
+                .build();
+
+            picker.setVisible(true);
         }
+
 
         /**
          * A callback function that extracts the chosen document's metadata from the
@@ -87,13 +83,19 @@
                 const id = doc[google.picker.Document.ID];
                 const url = doc[google.picker.Document.URL];
                 const title = doc[google.picker.Document.NAME];
-                google.script.run.test(id);
+                document.getElementById("folderId").value = id;
                 document.getElementById('result').innerHTML =
                     '<b>You chose:</b><br>Name: <a href="' + url + '">' + title +
                     '</a><br>ID: ' + id;
+
             } else if (action === google.picker.Action.CANCEL) {
                 document.getElementById('result').innerHTML = 'Picker canceled.';
             }
+        }
+
+        function execTextract(){
+            const folderId = document.getElementById("folderId").value;
+            google.script.run.main(folderId);
         }
 
         /**
@@ -110,6 +112,9 @@
 <div>
     <button onclick="getOAuthToken()">Select a file</button>
     <p id="result"></p>
+
+    <button onclick="execTextract()">Execute Textract</button>
+    <input type="hidden" id="folderId">
 </div>
 <script src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
 </body>
