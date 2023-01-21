@@ -1,4 +1,4 @@
-import {AlertMessage, AlertTitle, Timezone} from "./types";
+import {Timezone, UserLocale} from "./types";
 import {UI} from "./ui";
 import {User} from "./model/user";
 import {SheetService} from "./service/sheet.service";
@@ -7,19 +7,30 @@ import {TextractService} from "./service/textract.service";
 // [前提] Google Apps Script は実行時間 6 分での絶対の打ち切りが存在する。
 // [実装方針] いつ打ち切られても、再実行すれば処理が完了できるものを目指す。そのため実行効率が犠牲になるのは妥協する。
 // [妥協点の例] スプレッドシートへのデータ挿入は全件一括が最もパフォーマンスが良いが、処理打ち切りで処理中データが喪失するのを回避するため逐次的に挿入する。
-const DRIVE_URL_STARTS_WITH = "https://drive.google.com/folders"; // picker UI を利用して ID を取る方式のほうが手堅い (my-drive などを考えなくて良い, ただし Google Workspace の共有フォルダがどうなるかはわからない）
-const EXTRACT_ID_REGEX = /[-\w]{25,}/; // see https://stackoverflow.com/questions/16840038/easiest-way-to-get-file-id-from-url-on-google-apps-script
 const NUM_INSERT_ROW_THRESHOLD = 10;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function onOpen(e): void {
     Logger.log(e);
+    Logger.log(Object.keys(e));
+    Logger.log(e.user);
+    Logger.log(e.platform);
+    Logger.log(e.hostApp);
     const user = new User();
     if (e.timeZone !== undefined) {
         user.timezone = e.timeZone.id as Timezone;
     }
+    if (e.userLocale !== undefined) {
+        user.locale = e.userLocale as UserLocale;
+        Logger.log(e.timeZone.offset);
+    }
     Logger.log(`current setting timezone is ${user.timezone}`);
     UI.init();
+}
+
+function onInstall(e) {
+    onOpen(e);
+    // Perform additional setup as needed.
 }
 
 // TODO main 関数が起動のエンドポイントではなくなるので、それに合わせて書き換える
@@ -130,7 +141,17 @@ function getOAuthToken() {
         DriveApp.getRootFolder();
         return ScriptApp.getOAuthToken();
     } catch (e) {
-        // TODO (Developer) - Handle exception
-        console.log("Failed with error: %s", e.error);
+        // TODO Handle exception
+        Logger.log("Failed with error: %s", e.error);
     }
 }
+
+// function getUserLocale(){
+//     try{
+//
+//         return
+//     }catch (e){
+//         // TODO Handle exception
+//         Logger.log("Failed with error: %s", e.error);
+//     }
+// }

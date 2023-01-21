@@ -8,6 +8,7 @@ export class UI {
             .addItem("画像から文字列抽出", "main")
             .addItem("サイドバーを表示", "UI.showSettings")
             .addItem("pickerを表示", "UI.showPicker")
+            .addItem("respondToFormSubmit", "respondToFormSubmit")
             .addToUi();
     }
 

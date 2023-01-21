@@ -5,5 +5,6 @@ export type FileName = Brand<string, "FileName">;
 export type RFC3339Datetime = Brand<string, "RFC3339Datetime">;
 export type Byte = Brand<number, "Byte">;
 export type Timezone = Brand<string, "Timezone">;
+export type UserLocale = Brand<string, "UserLocale">;
 export type AlertTitle = Brand<string, "AlertTitle">;
 export type AlertMessage = Brand<string, "AlertMessage">;

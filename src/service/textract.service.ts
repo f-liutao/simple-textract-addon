@@ -12,6 +12,9 @@ export class TextractService {
       throw new Error("Drive API v2 を有効化してください。");
     }
 
+    //TODO add shared drive support
+    //TODO チームドライブでの動作確認
+    //SEE https://developers.google.com/drive/api/guides/enable-shareddrives#drive-api-v2
     const response = Drive.Files.insert({ title: blob.getName() }, blob, {
       ocr: true
     });

@@ -1,11 +1,10 @@
 <!--TODO https://developers.google.com/apps-script/guides/dialogs#code.gs_2 を実装する-->
+<!--TODO https://developers.google.com/apps-script/guides/html/best-practices#code.gs を参考にcssとjsを分離-->
 <!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
     <script>
-        // IMPORTANT: Replace the value for DEVELOPER_KEY with the API key obtained
-        // from the Google Developers Console.
         // const DEVELOPER_KEY = 'AIzaSyDwRLO8uKDHOIjBztYPJka7FMe_2z0A9Gg';
         const DIALOG_DIMENSIONS = {width: 600, height: 425};
         let pickerApiLoaded = false;
@@ -47,7 +46,7 @@
                 return;
             }
 
-            const docsView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+            const docsView = new google.picker.DocsView()
                 .setIncludeFolders(true)
                 .setSelectFolderEnabled(true);
 
@@ -55,6 +54,8 @@
                 .addView(docsView)
                 .enableFeature(google.picker.Feature.NAV_HIDDEN)
                 .hideTitleBar()
+                .setSelectableMimeTypes("application/vnd.google-apps.folder")
+                .setLocale("ja_JP")
                 .setOAuthToken(token)
                 // .setDeveloperKey(DEVELOPER_KEY)
                 .setCallback(pickerCallback)
@@ -77,23 +78,25 @@
         // TODO コールバックの中身を GAS 側に渡し、 google.script.run.withSuccessHandler(textract)　などで起動する
         function pickerCallback(data) {
             const action = data[google.picker.Response.ACTION];
-            // console.log(action);
-            if (action === google.picker.Action.PICKED) {
-                const doc = data[google.picker.Response.DOCUMENTS][0];
-                const id = doc[google.picker.Document.ID];
-                const url = doc[google.picker.Document.URL];
-                const title = doc[google.picker.Document.NAME];
-                document.getElementById("folderId").value = id;
-                document.getElementById('result').innerHTML =
-                    '<b>You chose:</b><br>Name: <a href="' + url + '">' + title +
-                    '</a><br>ID: ' + id;
-
-            } else if (action === google.picker.Action.CANCEL) {
-                document.getElementById('result').innerHTML = 'Picker canceled.';
+            if (action !== google.picker.Action.PICKED && action !== google.picker.Action.CANCEL) {
+                return
             }
+
+            if (action === google.picker.Action.CANCEL) {
+                document.getElementById('result').innerHTML = 'Picker canceled.';
+                return
+            }
+            const doc = data[google.picker.Response.DOCUMENTS][0];
+            const id = doc[google.picker.Document.ID];
+            const url = doc[google.picker.Document.URL];
+            const title = doc[google.picker.Document.NAME];
+            document.getElementById("folderId").value = id;
+            document.getElementById('result').innerHTML =
+                '<b>You chose:</b><br>Name: <a href="' + url + '">' + title +
+                '</a><br>ID: ' + id;
         }
 
-        function execTextract(){
+        function execTextract() {
             const folderId = document.getElementById("folderId").value;
             google.script.run.main(folderId);
         }
