@@ -1,4 +1,3 @@
-import {Timezone, UserLocale} from "./types";
 import {UI} from "./ui";
 import {User} from "./model/user";
 import {SheetService} from "./service/sheet.service";
@@ -11,59 +10,12 @@ const NUM_INSERT_ROW_THRESHOLD = 10;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function onOpen(e): void {
-    Logger.log(e);
-    Logger.log(Object.keys(e));
-    Logger.log(e.user);
-    Logger.log(e.platform);
-    Logger.log(e.hostApp);
-    const user = new User();
-    if (e.timeZone !== undefined) {
-        user.timezone = e.timeZone.id as Timezone;
-    }
-    if (e.userLocale !== undefined) {
-        user.locale = e.userLocale as UserLocale;
-        Logger.log(e.timeZone.offset);
-    }
-    Logger.log(`current setting timezone is ${user.timezone}`);
     UI.init();
-}
-
-function onInstall(e) {
-    onOpen(e);
-    // Perform additional setup as needed.
 }
 
 // TODO main 関数が起動のエンドポイントではなくなるので、それに合わせて書き換える
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function main(folderId: string): void {
-    // const folderUrl = UI.startPrompt(); // TODO キャンセルボタンを押した際の処理とURLが空の場合が同じ扱いになっているのでなんとかしたい
-    // Logger.log(`user input: ${folderUrl}`);
-    // if (folderUrl === "") {
-    //     const title = "正常終了。" as AlertTitle;
-    //     const message = "実行はキャンセルされました。" as AlertMessage;
-    //     UI.alert(message, title);
-    //     return;
-    // }
-
-    // // TODO Picker UI を利用するならこれは不要, 要はフォルダの ID が取れれば良い
-    // if (!folderUrl.startsWith(DRIVE_URL_STARTS_WITH)) {
-    //     const message =
-    //         `URLを確認してください。Google Drive のフォルダの URL は ${DRIVE_URL_STARTS_WITH}... という書式です。` as AlertMessage;
-    //     UI.alert(message);
-    //     return;
-    // }
-
-    // const matches = folderUrl.match(EXTRACT_ID_REGEX);
-    // Logger.log(`matches by folderId extraction regex: ${matches}`);
-    // if (!matches || matches.length < 1) {
-    //     const message =
-    //         "URLを確認してください。URL中のfolders/より後の文字列が切れていないか確認してください。" as AlertMessage;
-    //     UI.alert(message);
-    //     return;
-    // }
-
-    // const folderId = matches[0];
-
     // GCP のプロジェクト側で Google Drive API を有効化しないと、getFolderById でエラーがでる
     // https://qiita.com/Cyber_Hacnosuke/items/9b76fbe95da54694d758
     const folder = DriveApp.getFolderById(folderId);
@@ -72,16 +24,7 @@ function main(folderId: string): void {
     // TODO 画像が多すぎる場合の警告も実装が必要
     // GAS だと FileIterator で一つずつ数えるハメになるので、Drive API v2 を利用する
 
-
-    this.realMain(folder, new SheetService());
-}
-
-// TODO だんだん、分けた意味がなくなってきている。再度リファクタリングが必要。テスタビリティの維持が最重要。
-function realMain(
-    folder: GoogleAppsScript.Drive.Folder,
-    // namedRange: GoogleAppsScript.Spreadsheet.NamedRange
-    sheetService: SheetService
-): void {
+    const sheetService = new SheetService();
     const namedRange = sheetService.named_range ?? sheetService.initialize();
     const today = Utilities.formatDate(
         new Date(),
@@ -146,12 +89,25 @@ function getOAuthToken() {
     }
 }
 
-// function getUserLocale(){
-//     try{
-//
-//         return
-//     }catch (e){
-//         // TODO Handle exception
-//         Logger.log("Failed with error: %s", e.error);
-//     }
-// }
+function getUserLocale(){
+    try{
+        return Session.getActiveUserLocale();
+    }catch (e){
+        // TODO Handle exception
+        Logger.log("Failed with error: %s", e.error);
+    }
+}
+
+function getProcessStatus(folderId){
+    try{
+        const files = DriveApp.getFolderById(folderId).getFiles();
+        while (files.hasNext()) {
+            var folder = folders.next();
+            var infolderId = folder.getId();
+            data[j] = infolderId;
+            j++;
+        }
+    } catch (e){
+        Logger.log("Failed with error: %s", e.error);
+    }
+}

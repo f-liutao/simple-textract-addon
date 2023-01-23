@@ -8,6 +8,10 @@
         // const DEVELOPER_KEY = 'AIzaSyDwRLO8uKDHOIjBztYPJka7FMe_2z0A9Gg';
         const DIALOG_DIMENSIONS = {width: 600, height: 425};
         let pickerApiLoaded = false;
+        let lang = "ja";
+        let finished = 0; // num of processed files;
+        let targets = 0; // num of target files
+        let intervalChannel;
 
         /**
          * Loads the Google Picker API.
@@ -27,9 +31,16 @@
          * that Picker needs is available in Apps Script. Otherwise, your Picker code
          * will need to declare its own OAuth scopes.
          */
-        function getOAuthToken() {
+        function showPicker() {
             google.script.run.withSuccessHandler(createPicker)
-                .withFailureHandler(showError).getOAuthToken();
+                .withUserObject(lang)
+                .withFailureHandler(showError)
+                .getOAuthToken();
+        }
+
+        function getUserLocale() {
+            google.script.run.withSuccessHandler((l)=>{lang = l})
+                .withFailureHandler(showError).getUserLocale();
         }
 
         /**
@@ -40,7 +51,7 @@
          * @param {string} token An OAuth 2.0 access token that lets Picker access the
          *     file type specified in the addView call.
          */
-        function createPicker(token) {
+        function createPicker(token, lang) {
             if (!pickerApiLoaded || !token) {
                 showError('Unable to load the file picker.');
                 return;
@@ -57,7 +68,6 @@
                 .setSelectableMimeTypes("application/vnd.google-apps.folder")
                 .setLocale("ja_JP")
                 .setOAuthToken(token)
-                // .setDeveloperKey(DEVELOPER_KEY)
                 .setCallback(pickerCallback)
                 .setOrigin(google.script.host.origin)
                 .setSize(DIALOG_DIMENSIONS.width - 2, DIALOG_DIMENSIONS.height - 2)
@@ -99,6 +109,20 @@
         function execTextract() {
             const folderId = document.getElementById("folderId").value;
             google.script.run.main(folderId);
+            intervalChannel = setInterval(getProcessStatus, 10, folderId);
+        }
+
+        function getProcessStatus(folderId){
+            google.script.run.withSuccessHandler(updateProgress)
+                .withFailureHandler(showError).getProcessStatus(folderId)
+        }
+
+        function updateProgress(num){
+            if(finished >= 100 && !intervalChannel){
+                clearInterval(intervalChannel);
+                return
+            }
+            document.getElementById("progress").textContent = `進行状況 ${finished} / ${targets}`
         }
 
         /**
@@ -111,13 +135,14 @@
         }
     </script>
 </head>
-<body>
+<body onload="getUserLocale()">
 <div>
-    <button onclick="getOAuthToken()">Select a file</button>
+    <button onclick="showPicker()">Select a file</button>
     <p id="result"></p>
 
     <button onclick="execTextract()">Execute Textract</button>
     <input type="hidden" id="folderId">
+    <div id="progress"></div>
 </div>
 <script src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
 </body>

@@ -5,10 +5,9 @@ export class UI {
         const ui = SpreadsheetApp.getUi();
 
         ui.createAddonMenu()
-            .addItem("画像から文字列抽出", "main")
-            .addItem("サイドバーを表示", "UI.showSettings")
             .addItem("pickerを表示", "UI.showPicker")
-            .addItem("respondToFormSubmit", "respondToFormSubmit")
+            .addSeparator()
+            .addItem("設定", "UI.showSettings")
             .addToUi();
     }
 
