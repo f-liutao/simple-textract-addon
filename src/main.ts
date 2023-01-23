@@ -98,15 +98,14 @@ function getUserLocale(){
     }
 }
 
-function getProcessStatus(folderId){
+function getFiles(folderId){
     try{
+        let count = 0;
         const files = DriveApp.getFolderById(folderId).getFiles();
         while (files.hasNext()) {
-            var folder = folders.next();
-            var infolderId = folder.getId();
-            data[j] = infolderId;
-            j++;
+            count++;
         }
+        return count;
     } catch (e){
         Logger.log("Failed with error: %s", e.error);
     }

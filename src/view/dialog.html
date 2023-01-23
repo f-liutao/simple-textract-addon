@@ -107,14 +107,17 @@
         }
 
         function execTextract() {
+            // FIXME getFiles が同時に走りすぎて実行エラーになった。何かがおかしい。
             const folderId = document.getElementById("folderId").value;
+            google.script.run.withSuccessHandler((n)=>{targets = n})
+                .withFailureHandler(showError).getFiles(folderId); // オンメモリに実行対象ファイル数メモ
             google.script.run.main(folderId);
-            intervalChannel = setInterval(getProcessStatus, 10, folderId);
+            intervalChannel = setInterval(getProgress, 10, folderId);
         }
 
-        function getProcessStatus(folderId){
+        function getProgress(folderId){
             google.script.run.withSuccessHandler(updateProgress)
-                .withFailureHandler(showError).getProcessStatus(folderId)
+                .withFailureHandler(showError).getFiles(folderId)
         }
 
         function updateProgress(num){
