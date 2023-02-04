@@ -5,7 +5,6 @@
 <head>
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
     <script>
-        // const DEVELOPER_KEY = 'AIzaSyDwRLO8uKDHOIjBztYPJka7FMe_2z0A9Gg';
         const DIALOG_DIMENSIONS = {width: 600, height: 425};
         let pickerApiLoaded = false;
         let lang = "ja";
@@ -24,13 +23,6 @@
             });
         }
 
-        /**
-         * Gets the user's OAuth 2.0 access token from the server-side script so that
-         * it can be passed to Picker. This technique keeps Picker from needing to
-         * show its own authorization dialog, but is only possible if the OAuth scope
-         * that Picker needs is available in Apps Script. Otherwise, your Picker code
-         * will need to declare its own OAuth scopes.
-         */
         function showPicker() {
             google.script.run.withSuccessHandler(createPicker)
                 .withUserObject(lang)
