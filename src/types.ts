@@ -8,3 +8,6 @@ export type Timezone = Brand<string, "Timezone">;
 export type UserLocale = Brand<string, "UserLocale">;
 export type AlertTitle = Brand<string, "AlertTitle">;
 export type AlertMessage = Brand<string, "AlertMessage">;
+export type FolderId = Brand<string, "FolderId">;
+export const eventTypes = ["job-start", "start-recognition","end-recognition", "job-completed"] as const;
+export type EventType = typeof eventTypes[number]

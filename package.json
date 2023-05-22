@@ -1,10 +1,15 @@
 {
   "dependencies": {
-    "@types/google-apps-script": "^1.0.56"
+    "@types/google-apps-script": "^1.0.56",
+    "install": "^0.13.0"
   },
   "name": "simple-textract-addon",
   "version": "1.0.0",
   "devDependencies": {
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "@types/jest": "^29.5.1",
+    "@jest/globals": "^29.5.0",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.59.6",
     "eslint": "^8.29.0",

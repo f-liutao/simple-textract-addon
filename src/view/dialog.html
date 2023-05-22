@@ -1,144 +1,21 @@
 <!--TODO https://developers.google.com/apps-script/guides/dialogs#code.gs_2 を実装する-->
-<!--TODO https://developers.google.com/apps-script/guides/html/best-practices#code.gs を参考にcssとjsを分離-->
 <!DOCTYPE html>
-<html>
+<html lang="jp">
 <head>
+    <title>Simple Textract</title>
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
-    <script>
-        const DIALOG_DIMENSIONS = {width: 600, height: 425};
-        let pickerApiLoaded = false;
-        let lang = "ja";
-        let finished = 0; // num of processed files;
-        let targets = 0; // num of target files
-        let intervalChannel;
-
-        /**
-         * Loads the Google Picker API.
-         */
-        function onApiLoad() {
-            gapi.load('picker', {
-                'callback': function () {
-                    pickerApiLoaded = true;
-                }
-            });
-        }
-
-        function showPicker() {
-            google.script.run.withSuccessHandler(createPicker)
-                .withUserObject(lang)
-                .withFailureHandler(showError)
-                .getOAuthToken();
-        }
-
-        function getUserLocale() {
-            google.script.run.withSuccessHandler((l)=>{lang = l})
-                .withFailureHandler(showError).getUserLocale();
-        }
-
-        /**
-         * Creates a Picker that can access the user's spreadsheets. This function
-         * uses advanced options to hide the Picker's left navigation panel and
-         * default title bar.
-         *
-         * @param {string} token An OAuth 2.0 access token that lets Picker access the
-         *     file type specified in the addView call.
-         */
-        function createPicker(token, lang) {
-            if (!pickerApiLoaded || !token) {
-                showError('Unable to load the file picker.');
-                return;
-            }
-
-            const docsView = new google.picker.DocsView()
-                .setIncludeFolders(true)
-                .setSelectFolderEnabled(true);
-
-            const picker = new google.picker.PickerBuilder()
-                .addView(docsView)
-                .enableFeature(google.picker.Feature.NAV_HIDDEN)
-                .hideTitleBar()
-                .setSelectableMimeTypes("application/vnd.google-apps.folder")
-                .setLocale("ja_JP")
-                .setOAuthToken(token)
-                .setCallback(pickerCallback)
-                .setOrigin(google.script.host.origin)
-                .setSize(DIALOG_DIMENSIONS.width - 2, DIALOG_DIMENSIONS.height - 2)
-                .build();
-
-            picker.setVisible(true);
-        }
-
-
-        /**
-         * A callback function that extracts the chosen document's metadata from the
-         * response object. For details on the response object, see
-         * https://developers.google.com/picker/docs/result
-         *
-         * @param {object} data The response object.
-         */
-
-        // TODO コールバックの中身を GAS 側に渡し、 google.script.run.withSuccessHandler(textract)　などで起動する
-        function pickerCallback(data) {
-            const action = data[google.picker.Response.ACTION];
-            if (action !== google.picker.Action.PICKED && action !== google.picker.Action.CANCEL) {
-                return
-            }
-
-            if (action === google.picker.Action.CANCEL) {
-                document.getElementById('result').innerHTML = 'Picker canceled.';
-                return
-            }
-            const doc = data[google.picker.Response.DOCUMENTS][0];
-            const id = doc[google.picker.Document.ID];
-            const url = doc[google.picker.Document.URL];
-            const title = doc[google.picker.Document.NAME];
-            document.getElementById("folderId").value = id;
-            document.getElementById('result').innerHTML =
-                '<b>You chose:</b><br>Name: <a href="' + url + '">' + title +
-                '</a><br>ID: ' + id;
-        }
-
-        function execTextract() {
-            // FIXME getFiles が同時に走りすぎて実行エラーになった。何かがおかしい。
-            const folderId = document.getElementById("folderId").value;
-            google.script.run.withSuccessHandler((n)=>{targets = n})
-                .withFailureHandler(showError).getFiles(folderId); // オンメモリに実行対象ファイル数メモ
-            google.script.run.main(folderId);
-            intervalChannel = setInterval(getProgress, 10, folderId);
-        }
-
-        function getProgress(folderId){
-            google.script.run.withSuccessHandler(updateProgress)
-                .withFailureHandler(showError).getFiles(folderId)
-        }
-
-        function updateProgress(num){
-            if(finished >= 100 && !intervalChannel){
-                clearInterval(intervalChannel);
-                return
-            }
-            document.getElementById("progress").textContent = `進行状況 ${finished} / ${targets}`
-        }
-
-        /**
-         * Displays an error message within the #result element.
-         *
-         * @param {string} message The error message to display.
-         */
-        function showError(message) {
-            document.getElementById('result').innerHTML = 'Error: ' + message;
-        }
-    </script>
+    <?!= include('stylesheet'); ?>
 </head>
 <body onload="getUserLocale()">
-<div>
-    <button onclick="showPicker()">Select a file</button>
-    <p id="result"></p>
+    <div>
+        <button onclick="showPicker()">Select a file</button>
+        <p id="result"></p>
 
-    <button onclick="execTextract()">Execute Textract</button>
-    <input type="hidden" id="folderId">
-    <div id="progress"></div>
-</div>
-<script src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
+        <button onclick="execTextract()">Execute Textract</button>
+        <input type="hidden" id="folderId">
+        <div id="progress"></div>
+    </div>
+    <script src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
+    <?!= include('javascript'); ?>
 </body>
 </html>

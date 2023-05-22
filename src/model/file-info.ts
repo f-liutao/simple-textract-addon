@@ -4,7 +4,7 @@ export class FileInfo {
   fileName: FileName;
   hash: Sha1HashHexString;
   lastUpdated: RFC3339Datetime;
-  text: string;
+  recognizedText: string;
 
   constructor(
     fileName: FileName,
@@ -15,6 +15,6 @@ export class FileInfo {
     this.fileName = fileName;
     this.hash = hash;
     this.lastUpdated = lastUpdated;
-    this.text = text;
+    this.recognizedText = text;
   }
 }

@@ -1,71 +1,60 @@
+import {FileInfo} from "../model/file-info";
+import {FolderId, EventType, RFC3339Datetime, FileName} from "../types";
+import {Util} from "../util";
+import {User} from "../model/user";
+
 const OUTPUT_SHEET_NAME = "textract";
-const NAMED_RANGE_NAME = "textract_results";
-const SHEET_HEADER = [
+const LOG_SHEET_NAME = "textract-log";
+const OUTPUT_SHEET_HEADER = [
     "フォルダ番号",
     "ハッシュ値(sha1)",
     "ファイル名",
     "最終更新日",
     "認識文字列"
 ];
+const LOG_SHEET_HEADER = [
+    "日時",
+    "操作",
+    "対象ファイル名"
+];
+
+
+
+interface LogEvent {
+    type: EventType;
+    target: FileName;
+}
+
+interface Result extends FileInfo{
+    now: RFC3339Datetime;
+    folderId: FolderId;
+}
 
 export class SheetService {
     spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet;
+    outputSheet: GoogleAppsScript.Spreadsheet.Sheet;
+    logSheet: GoogleAppsScript.Spreadsheet.Sheet;
 
     constructor() {
         this.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+        this.outputSheet = this.spreadsheet.getSheetByName(OUTPUT_SHEET_NAME) ?? this.createSheet(OUTPUT_SHEET_NAME, OUTPUT_SHEET_HEADER);
+        this.logSheet = this.spreadsheet.getSheetByName(LOG_SHEET_NAME) ?? this.createSheet(LOG_SHEET_NAME, LOG_SHEET_HEADER);
     }
 
-    get named_range(): GoogleAppsScript.Spreadsheet.NamedRange | undefined {
-        const nullableNamedRange = this.spreadsheet
-            .getNamedRanges()
-            .filter((r) => r.getName() === NAMED_RANGE_NAME)
-            .shift();
-        return nullableNamedRange;
-    }
-
-    initialize(): GoogleAppsScript.Spreadsheet.NamedRange {
+    private createSheet(sheetName: string, header: string[]): GoogleAppsScript.Spreadsheet.Sheet {
         const sheet = this.spreadsheet.insertSheet(1);
-        sheet.setName(OUTPUT_SHEET_NAME);
-
+        sheet.setName(sheetName);
         // 結果出力用の名前付き範囲を定義
-        const range = sheet.getRange(1, 1, 1, SHEET_HEADER.length);
-        range.setValues([SHEET_HEADER]);
-        this.spreadsheet.setNamedRange(NAMED_RANGE_NAME, range);
-        const namedRange = this.spreadsheet
-            .getNamedRanges()
-            .filter((r) => r.getName() === NAMED_RANGE_NAME)
-            .shift();
-
-        if (namedRange === undefined) {
-            throw Error(`namedRange is ${namedRange}`);
-        }
-        return namedRange;
+        sheet.getRange(1, 1, 1, header.length).setValues([header]);
+        return sheet;
     }
 
+    outLog(event: LogEvent){
+        this.logSheet.appendRow([Util.rfc3339datetime(new Date(),
+            new User().timezone), event["type"], event["target"]]);
+    }
 
-    appendData(
-        namedRange: GoogleAppsScript.Spreadsheet.NamedRange,
-        data: string[][]
-    ): void {
-        const range = namedRange.getRange();
-        const currentValues = range.getValues();
-
-        const numRows = range.getNumRows() + data.length;
-        const newRange = range.offset(0, 0, numRows, SHEET_HEADER.length);
-        Logger.log(
-            `currentValues rows: ${currentValues.length}, cols: ${currentValues[0].length}`
-        );
-        Logger.log(
-            `newRange rows: ${newRange.getNumRows()}, cols: ${newRange.getNumColumns()}`
-        );
-        Logger.log(
-            `newValues rows: ${currentValues.concat(data).length}, cols: ${
-                currentValues.concat(data)[0].length
-            }, and data is ${currentValues.concat(data)}`
-        );
-        namedRange
-            .setRange(newRange)
-            .getRange()
-            .setValues(currentValues.concat(data));
+    appendResult(result: Result){
+        this.outputSheet.appendRow([result["folderNum"], result["fileHash"], result["fileName"], result["updatedAt"], result["recognizedText"]]);
     }
 }
