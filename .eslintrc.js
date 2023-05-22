@@ -6,8 +6,7 @@ module.exports = {
   extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   parserOptions: {
     ecmaVersion: "latest",
-    sourceType: "module",
-    project: ["tsconfig.json"]
+    project: ["./tsconfig.json"]
   },
   rules: {
     "@typescript-eslint/prefer-string-starts-ends-with": "warn",

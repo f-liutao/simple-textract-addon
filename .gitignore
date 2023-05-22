@@ -1,5 +1,4 @@
 ﻿.idea
-project/schedule-template/.clasp.json
 node_modules
-.clasp.json
-.claspignore
+conf/.clasp.json
+conf/.claspignore
